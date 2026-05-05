@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SupTech Internat - Gestion Résidentielle</title>
+  <meta name="description"
+    content="Plateforme de gestion de l'internat pour SupTech Santé et SupTech Environnement (FRDISI / UIB)">
+
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- ==================== LOGIN ==================== -->
+  <div id="login-screen" class="screen active">
+    <div class="login-container">
+      <div class="login-brand">
+        <div class="login-logo-wrap">
+          <div class="login-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="login-title">SupTech Internat</div>
+        <div class="login-sub">FRDISI · UIB · Mohammedia</div>
+      </div>
+
+      <div class="login-card glass-panel">
+        <div class="login-role-tabs">
+          <div class="role-tab active" id="tab-admin" onclick="setRole('admin')">Administrateur</div>
+          <div class="role-tab" id="tab-res" onclick="setRole('resident')">Résident</div>
+        </div>
+
+        <form id="login-form" onsubmit="event.preventDefault(); doLogin();">
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="votre@email.ma" value="admin@suptech.ma" required>
+          </div>
+          <div class="field">
+            <label>Mot de passe</label>
+            <input type="password" id="login-pass" placeholder="••••••••" value="••••••••" required>
+          </div>
+          <div class="field" id="field-school" style="display:none">
+            <label>Établissement</label>
+            <select id="login-school">
+              <option value="">Sélectionner votre école</option>
+              <option value="sante">SupTech Santé</option>
+              <option value="env">SupTech Environnement</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-login btn-gradient">Se connecter</button>
+        </form>
+
+        <div class="demo-hint" id="demo-hint-admin">
+          <strong>Démo Admin :</strong> admin@suptech.ma<br>
+          Gérez les résidents de SupTech Santé et Environnement.
+        </div>
+        <div class="demo-hint" id="demo-hint-res" style="display:none;">
+          <strong>Démo Résident :</strong> fatima@suptech.ma<br>
+          Accédez à votre espace étudiant personnel.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN APP ==================== -->
+  <div id="admin-screen" class="screen app-shell">
+    <!-- SIDEBAR ADMIN -->
+    <div class="sidebar">
+      <div class="sb-brand">
+        <div class="sb-logo">
+          <div class="sb-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+          </div>
+          <div class="sb-text">
+            <div class="t1">SupTech Internat</div>
+            <div class="t2">Panel administrateur</div>
+          </div>
+        </div>
+      </div>
+      <div class="sb-user">
+        <div class="av av-admin">AK</div>
+        <div class="sb-user-info">
+          <div class="name">Admin Karim</div>
+          <div class="role">FRDISI Coordination</div>
+        </div>
+        <div class="role-pill rp-admin">ADMIN</div>
+      </div>
+      <div class="sb-nav">
+        <div class="nav-section">Principal</div>
+        <div class="nav-item active" onclick="aNav('a-dash',this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          Tableau de bord
+        </div>
+        <div class="nav-item" onclick="aNav('a-residents',this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          Résidents <span class="nb">47</span>
+        </div>
+        <div class="nav-item" onclick="aNav('a-chambres',this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          </svg>
+          Chambres
+        </div>
+        <div class="nav-section">Finance</div>
+        <div class="nav-item" onclick="aNav('a-paiements',this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          Paiements <span class="nb" style="background:var(--accent-warm);">5</span>
+        </div>
+        <div class="nav-item" onclick="aNav('a-reclamations',this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          Réclamations <span class="nb">3</span>
+        </div>
+        <div class="nav-section">Administration</div>
+        <div class="nav-item" onclick="aNav('a-admins',this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          Administrateurs
+        </div>
+        <div class="nav-item" onclick="aNav('a-stats',this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Statistiques
+        </div>
+      </div>
+      <div class="sb-logout">
+        <div class="logout-btn" onclick="doLogout()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Déconnexion
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN ADMIN -->
+    <div class="main-area">
+      <div class="topbar">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div class="page-title" id="a-page-title">Tableau de bord</div>
+        <div class="spacer"></div>
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" placeholder="Rechercher...">
+        </div>
+        <div class="notif-btn" onclick="showToast('Aucune nouvelle notification')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <div class="notif-dot"></div>
+        </div>
+        <button class="btn-primary btn-gradient" onclick="openModal('resident')">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+            style="margin-right:4px; vertical-align:middle;">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Ajouter
+        </button>
+      </div>
+
+      <div class="content">
+        <!-- DASHBOARD -->
+        <div class="view active" id="a-dash">
+          <div class="stats-grid">
+            <div class="stat-card glass-panel">
+              <div class="stat-icon-wrap" style="background: rgba(0,210,255,0.1); color: var(--primary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="stat-lbl">Résidents actifs</div>
+                <div class="stat-val gradient-text">47</div>
+                <div class="stat-sub positive">+3 ce mois</div>
+              </div>
+            </div>
+            <div class="stat-card glass-panel">
+              <div class="stat-icon-wrap" style="background: rgba(58,123,213,0.1); color: var(--secondary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="stat-lbl">Chambres occupées</div>
+                <div class="stat-val" style="color:var(--secondary)">38/50</div>
+                <div class="stat-sub">76% occupation</div>
+              </div>
+            </div>
+            <div class="stat-card glass-panel">
+              <div class="stat-icon-wrap" style="background: rgba(46,204,113,0.1); color: #2ecc71;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="stat-lbl">Revenus Mai</div>
+                <div class="stat-val" style="color:#2ecc71">52 500</div>
+                <div class="stat-sub positive">DH collectés</div>
+              </div>
+            </div>
+            <div class="stat-card glass-panel">
+              <div class="stat-icon-wrap" style="background: rgba(231,76,60,0.1); color: #e74c3c;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
+              <div>
+                <div class="stat-lbl">Retards paiement</div>
+                <div class="stat-val" style="color:#e74c3c">5</div>
+                <div class="stat-sub negative">7 500 DH dus</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card glass-panel">
+              <div class="card-head">
+                <div class="card-title">Revenus mensuels 2025</div>
+              </div>
+              <div class="chart-wrap"><canvas id="revChart"></canvas></div>
+            </div>
+            <div class="card glass-panel">
+              <div class="card-head">
+                <div class="card-title">Occupation globale</div>
+              </div>
+              <div class="chart-wrap"><canvas id="occChart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card glass-panel">
+            <div class="card-head">
+              <div class="card-title">Résidents récents</div>
+              <button class="btn-link" onclick="aNav('a-residents',null)">Voir tout →</button>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Résident</th>
+                    <th>Établissement</th>
+                    <th>Chambre</th>
+                    <th>Paiement</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="table-user">
+                        <div class="av">FZ</div><span>Fatima Zahra Idrissi</span>
+                      </div>
+                    </td>
+                    <td class="text-muted">SupTech Santé</td>
+                    <td>101 — Indiv.</td>
+                    <td><span class="badge bg-success">Payé</span></td>
+                    <td class="score-high">92</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="table-user">
+                        <div class="av" style="background:var(--accent-warm)">MA</div><span>Mehdi Alaoui</span>
+                      </div>
+                    </td>
+                    <td class="text-muted">SupTech Santé</td>
+                    <td>204 — Double</td>
+                    <td><span class="badge bg-danger">Retard</span></td>
+                    <td class="score-low">58</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="table-user">
+                        <div class="av" style="background:#f39c12">YB</div><span>Yasmine Benhaddou</span>
+                      </div>
+                    </td>
+                    <td class="text-muted">SupTech Env.</td>
+                    <td>312 — Double</td>
+                    <td><span class="badge bg-warning">Attente</span></td>
+                    <td class="score-medium">74</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="table-user">
+                        <div class="av" style="background:#27ae60">AO</div><span>Amine Ouazzani</span>
+                      </div>
+                    </td>
+                    <td class="text-muted">SupTech Env.</td>
+                    <td>115 — Indiv.</td>
+                    <td><span class="badge bg-success">Payé</span></td>
+                    <td class="score-high">88</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Admin Views... (residents, chambres, paiements, reclamations, admins, stats) -->
+        <!-- To keep it concise yet functional, the structure remains similar but classes are updated for the new CSS -->
+
+        <div class="view" id="a-residents">
+          <div class="action-bar">
+            <select class="filter-select">
+              <option>Toutes les écoles</option>
+              <option>SupTech Santé</option>
+              <option>SupTech Environnement</option>
+            </select>
+            <select class="filter-select">
+              <option>Tous statuts</option>
+              <option>Payé</option>
+              <option>En retard</option>
+            </select>
+            <div class="spacer"></div>
+            <button class="btn-primary btn-gradient" onclick="openModal('resident')">Ajouter résident</button>
+            <button class="btn-outline" onclick="mockAction('Exportation Excel démarrée')">Export Excel</button>
+          </div>
+          <div class="card glass-panel">
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Résident</th>
+                    <th>Établissement</th>
+                    <th>Chambre</th>
+                    <th>Caution</th>
+                    <th>Loyer Mai</th>
+                    <th>Score</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="table-user">
+                        <div class="av">FZ</div>
+                        <div>
+                          <div class="fw-bold">Fatima Zahra Idrissi</div>
+                          <div class="text-xs text-muted">STH-2024-047</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-muted">SupTech Santé</td>
+                    <td>101 Indiv.</td>
+                    <td><span class="badge bg-success">Payée</span></td>
+                    <td><span class="badge bg-success">Payé</span></td>
+                    <td class="score-high">92</td>
+                    <td><span class="status-indicator"><span class="dot dot-success"></span>OK</span></td>
+                    <td><button class="btn-action" onclick="mockAction('Édition du résident')">Modifier</button></td>
+                  </tr>
+                  <!-- More rows here... omitted for brevity but represented structurally -->
+                  <tr>
+                    <td>
+                      <div class="table-user">
+                        <div class="av" style="background:var(--accent-warm)">MA</div>
+                        <div>
+                          <div class="fw-bold">Mehdi Alaoui</div>
+                          <div class="text-xs text-muted">STH-2024-012</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-muted">SupTech Santé</td>
+                    <td>204 Double</td>
+                    <td><span class="badge bg-success">Payée</span></td>
+                    <td><span class="badge bg-danger">Retard</span></td>
+                    <td class="score-low">58</td>
+                    <td><span class="status-indicator"><span class="dot dot-danger"></span>Action</span></td>
+                    <td><button class="btn-action" onclick="mockAction('Édition du résident')">Modifier</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add placeholders for other views to be functional -->
+        <div class="view" id="a-chambres">
+          <div class="stats-grid-3">
+            <div class="stat-card glass-panel">
+              <div class="stat-lbl">Chambres individuelles</div>
+              <div class="stat-val gradient-text">20</div>
+              <div class="stat-sub">1 500 DH/mois · 16 occupées</div>
+            </div>
+            <div class="stat-card glass-panel">
+              <div class="stat-lbl">Chambres doubles</div>
+              <div class="stat-val gradient-text">30</div>
+              <div class="stat-sub">750 DH/mois · 22 occupées</div>
+            </div>
+            <div class="stat-card glass-panel">
+              <div class="stat-lbl">Caution obligatoire</div>
+              <div class="stat-val gradient-text">1 500</div>
+              <div class="stat-sub">DH par résident</div>
+            </div>
+          </div>
+          <div class="card glass-panel mt-16">
+            <div class="card-head">
+              <div class="card-title">Plan des chambres — Étage 1</div>
+            </div>
+            <div id="room-grid-a" class="room-grid"></div>
+          </div>
+        </div>
+
+        <div class="view" id="a-paiements">
+          <div class="action-bar">
+            <div class="spacer"></div>
+            <button class="btn-outline" onclick="mockAction('Exportation PDF démarrée')">Export PDF</button>
+          </div>
+          <div class="card glass-panel mt-16">
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Résident</th>
+                    <th>École</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Fatima Zahra Idrissi</td>
+                    <td class="text-muted">SupTech Santé</td>
+                    <td>Loyer Mai</td>
+                    <td class="fw-bold">1 500 DH</td>
+                    <td class="text-muted">01/05</td>
+                    <td><span class="badge bg-success">Payé</span></td>
+                  </tr>
+                  <tr>
+                    <td>Amine Ouazzani</td>
+                    <td class="text-muted">SupTech Env.</td>
+                    <td>Loyer Mai</td>
+                    <td class="fw-bold">1 500 DH</td>
+                    <td class="text-muted">02/05</td>
+                    <td><span class="badge bg-success">Payé</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="a-reclamations">
+          <div class="rec-item glass-panel">
+            <div class="rec-head">
+              <div class="rec-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; margin-right: 6px; vertical-align: middle; flex-shrink: 0;"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                Problème WiFi — Chambre 204
+              </div><span class="badge bg-warning">En
+                attente</span>
+            </div>
+            <div class="rec-body">Connexion très lente depuis 3 jours. Impossible de suivre les cours en ligne UIB.
+            </div>
+            <div class="rec-meta"><span>Mehdi Alaoui · SupTech Santé</span><span>04/05/2025</span></div>
+            <div class="rec-actions">
+              <button class="btn-action" onclick="mockAction('Ouverture formulaire de réponse')">Répondre</button>
+              <button class="btn-action success-text" onclick="mockAction('Réclamation marquée comme résolue')">Marquer
+                Résolu</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="a-admins">
+          <div class="action-bar">
+            <div class="text-muted">Gérez les comptes de la FRDISI</div>
+            <div class="spacer"></div>
+            <button class="btn-primary btn-gradient" onclick="openModal('admin')">Ajouter administrateur</button>
+          </div>
+          <div class="card glass-panel mt-16">
+            <div class="admin-item">
+              <div class="av av-admin">AK</div>
+              <div class="admin-info">
+                <div class="fw-bold">Admin Karim</div>
+                <div class="text-xs text-muted">admin@suptech.ma</div>
+              </div>
+              <div class="text-right"><span class="badge bg-success">Actif</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="a-stats">
+          <div class="grid2-eq">
+            <div class="card glass-panel">
+              <div class="card-head">
+                <div class="card-title">Réclamations</div>
+              </div>
+              <div class="chart-wrap"><canvas id="recStatsChart"></canvas></div>
+            </div>
+            <div class="card glass-panel">
+              <div class="card-head">
+                <div class="card-title">Écoles</div>
+              </div>
+              <div class="chart-wrap"><canvas id="ecoleStatsChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ADMIN MODALS -->
+    <div class="modal-overlay" id="modal-resident">
+      <div class="modal glass-panel">
+        <div class="modal-title">Ajouter un résident<span class="modal-close"
+            onclick="closeModal('resident')">&times;</span></div>
+        <form onsubmit="event.preventDefault(); addResident();">
+          <div class="form-grid">
+            <div class="form-field"><label>Prénom</label><input type="text" required></div>
+            <div class="form-field"><label>Nom</label><input type="text" required></div>
+            <div class="form-field full"><label>École (FRDISI)</label>
+              <select required>
+                <option value="">Choisir...</option>
+                <option>SupTech Santé</option>
+                <option>SupTech Environnement</option>
+                <option>UIB</option>
+              </select>
+            </div>
+            <div class="form-field"><label>Type chambre</label><select>
+                <option>Individuelle</option>
+                <option>Double</option>
+              </select></div>
+            <div class="form-field"><label>Date d'entrée</label><input type="date" value="2025-09-01"></div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-outline" onclick="closeModal('resident')">Annuler</button>
+            <button type="submit" class="btn-primary btn-gradient">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-admin">
+      <div class="modal glass-panel">
+        <div class="modal-title">Nouvel admin FRDISI<span class="modal-close"
+            onclick="closeModal('admin')">&times;</span></div>
+        <form onsubmit="event.preventDefault(); addAdmin();">
+          <div class="form-grid">
+            <div class="form-field full"><label>Email</label><input type="email" id="new-admin-email" required></div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-outline" onclick="closeModal('admin')">Annuler</button>
+            <button type="submit" class="btn-primary btn-gradient">Créer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== RESIDENT APP ==================== -->
+  <div id="res-screen" class="screen app-shell">
+    <div class="sidebar">
+      <div class="sb-brand">
+        <div class="sb-logo">
+          <div class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg></div>
+          <div class="sb-text">
+            <div class="t1">Espace Étudiant</div>
+            <div class="t2">SupTech Santé</div>
+          </div>
+        </div>
+      </div>
+      <div class="sb-user">
+        <div class="av av-res">FZ</div>
+        <div class="sb-user-info">
+          <div class="name">Fatima Z. Idrissi</div>
+          <div class="role">Chambre 101</div>
+        </div>
+      </div>
+      <div class="sb-nav">
+        <div class="nav-section">Mon espace</div>
+        <div class="nav-item active" onclick="rNav('r-dash',this)">Tableau de bord</div>
+        <div class="nav-item" onclick="rNav('r-chambre',this)">Ma chambre & QR</div>
+        <div class="nav-item" onclick="rNav('r-paiements',this)">Mes paiements</div>
+        <div class="nav-item" onclick="rNav('r-factures',this)">Mes factures</div>
+        <div class="nav-item" onclick="rNav('r-reclamations',this)">Mes réclamations</div>
+        <div class="nav-section">Services</div>
+        <div class="nav-item" onclick="rNav('r-reservation',this)">Réservation 2025-26</div>
+      </div>
+      <div class="sb-logout">
+        <div class="logout-btn" onclick="doLogout()">Déconnexion</div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="topbar">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div class="page-title" id="r-page-title">Mon tableau de bord</div>
+        <div class="spacer"></div>
+        <div class="school-badge">SupTech Santé (FRDISI)</div>
+      </div>
+      <div class="content">
+
+        <div class="view active" id="r-dash">
+          <div class="status-banner banner-success">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px; color: #2ecc71;"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"></path></svg>
+            </div>
+            <div>
+              <div class="fw-bold">Tout est en ordre, Fatima Zahra</div>
+              <div class="text-xs">Loyer Mai payé · Score 92/100</div>
+            </div>
+          </div>
+          <div class="stats-grid-3 mt-16">
+            <div class="stat-card glass-panel">
+              <div class="stat-lbl">Chambre</div>
+              <div class="stat-val gradient-text">101</div>
+            </div>
+            <div class="stat-card glass-panel">
+              <div class="stat-lbl">Score</div>
+              <div class="stat-val gradient-text">92/100</div>
+            </div>
+            <div class="stat-card glass-panel">
+              <div class="stat-lbl">Loyer</div>
+              <div class="stat-val gradient-text">À jour</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="r-chambre">
+          <div class="grid2-eq">
+            <div class="card glass-panel">
+              <div class="card-head">
+                <div class="card-title">Mon QR Code</div>
+              </div>
+              <div class="qr-container">
+                <!-- Mock QR -->
+                <div class="qr-box"></div>
+                <div class="fw-bold mt-16">ID : STH-2024-047</div>
+                <button class="btn-primary mt-16" onclick="mockAction('Téléchargement du QR Code...')">Télécharger
+                  QR</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="r-paiements">
+          <div class="card glass-panel">
+            <div class="card-head">
+              <div class="card-title">Historique</div><button class="btn-outline"
+                onclick="mockAction('Export PDF généré')">Export PDF</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Mois</th>
+                  <th>Montant</th>
+                  <th>Statut</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mai 2025</td>
+                  <td>1 500 DH</td>
+                  <td><span class="badge bg-success">Payé</span></td>
+                  <td><button class="btn-action"
+                      onclick="mockAction('Facture en cours de téléchargement')">Facture</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="view" id="r-factures">
+          <div class="card glass-panel">
+            <p>Retrouvez ici toutes vos factures FRDISI / UIB.</p>
+            <button class="btn-primary" onclick="mockAction('Téléchargement global...')">Télécharger Tout</button>
+          </div>
+        </div>
+
+        <div class="view" id="r-reclamations">
+          <button class="btn-primary btn-gradient mb-16" onclick="openModal('reclamation')">+ Nouvelle</button>
+          <div class="rec-item glass-panel">
+            <div class="fw-bold" style="display:flex; align-items:center;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; margin-right: 6px; flex-shrink: 0; color: #f39c12;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              Prise électrique
+            </div>
+            <div class="text-muted text-xs mt-8">Résolu le 30/04/2025</div>
+          </div>
+        </div>
+
+        <div class="view" id="r-reservation">
+          <div class="card glass-panel text-center">
+            <div class="fw-bold text-lg mb-16">Renouvellement 2025-2026</div>
+            <button class="btn-primary btn-gradient"
+              onclick="mockAction('Demande de reconduction envoyée !')">Reconduire ma chambre</button>
+            <button class="btn-outline ml-8" onclick="mockAction('Demande de changement enregistrée')">Demander chambre
+              double</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-reclamation">
+      <div class="modal glass-panel">
+        <div class="modal-title">Réclamation<span class="modal-close" onclick="closeModal('reclamation')">&times;</span>
+        </div>
+        <form onsubmit="event.preventDefault(); submitReclamation();">
+          <div class="form-field mb-16">
+            <label>Type de problème</label>
+            <div class="category-buttons">
+              <button type="button" class="btn-category" onclick="selectCategory(this, 'WiFi')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                WiFi
+              </button>
+              <button type="button" class="btn-category" onclick="selectCategory(this, 'Électricité')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Électricité
+              </button>
+              <button type="button" class="btn-category" onclick="selectCategory(this, 'Plomberie')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                Plomberie
+              </button>
+              <button type="button" class="btn-category" onclick="selectCategory(this, 'Nettoyage')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"></path></svg>
+                Nettoyage
+              </button>
+              <button type="button" class="btn-category" onclick="selectCategory(this, 'Sécurité')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                Sécurité
+              </button>
+              <button type="button" class="btn-category" onclick="selectCategory(this, 'Paiement')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                Paiement
+              </button>
+              <button type="button" class="btn-category" onclick="selectCategory(this, 'Autre')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Autre
+              </button>
+            </div>
+            <input type="hidden" id="reclamation-type" required>
+          </div>
+          <div class="form-field"><label>Description</label><textarea required rows="4" placeholder="Détaillez votre problème..."></textarea></div>
+          <div class="modal-actions">
+            <button type="button" class="btn-outline" onclick="closeModal('reclamation')">Annuler</button>
+            <button type="submit" class="btn-primary btn-gradient">Soumettre</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div class="modal-overlay" id="modal-success">
+    <div class="modal glass-panel" style="text-align:center; padding:40px;">
+      <div id="success-icon" style="margin-bottom:16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; display: inline-block;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      </div>
+      <div id="success-title" class="fw-bold text-lg mb-8">Succès</div>
+      <div id="success-body" class="text-muted mb-24">L'action a été réalisée avec succès.</div>
+      <button class="btn-primary btn-gradient" onclick="closeModal('success')">Fermer</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
