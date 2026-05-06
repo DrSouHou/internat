@@ -78,3 +78,5 @@ The login screen provides two roles for demonstration:
 ## 📄 License
 
 This project is proprietary and built specifically for FRDISI / UIB (SupTech). All rights reserved.
+
+Managed by DrSouHou
